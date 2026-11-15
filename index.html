@@ -1861,6 +1861,15 @@ async function passoTrava(){
   const tent=v.instalacao?.tentativas||1;
   $('#wz').innerHTML=`<div class="card"><h2><span class="step">8</span>Instalar a trava no ${esc(apNome(v))} ${tent>1?badge('tentativa '+tent,'amber'):''}</h2>
     <div class="warn mb"><b>A venda só é concluída quando a trava subir no aparelho.</b> Não entregue o celular antes da confirmação abaixo ficar verde.</div>
+    <details class="mb"><summary class="btn sm" style="display:inline-flex">✓ Checklist antes de instalar</summary>
+      <ol class="steps small" style="margin-top:8px">
+        <li><b>Restaure de fábrica</b> e, na configuração inicial, <b>pule a conta Google</b> (não faça login).</li>
+        <li>Conecte no <b>Wi-Fi da loja</b> — precisa de internet para baixar o app.</li>
+        <li>Na primeira tela, <b>toque 6 vezes</b> no mesmo ponto e leia o QR ao lado.</li>
+        <li><b>Não pule etapas</b> nem adicione conta Google antes do app terminar de instalar.</li>
+        <li>Espere a confirmação ficar <b>verde</b> antes de entregar ao cliente.</li>
+        ${String(S.cfg.frpContas||'').trim()?'<li style="color:var(--good)">Proteção contra reset (FRP) configurada na loja.</li>':'<li style="color:var(--bad)"><b>FRP não configurado</b> — o aparelho ficará vulnerável a reset de fábrica. Avise o dono antes de vender.</li>'}
+      </ol></details>
     <div class="grid g2" style="align-items:start">
       <div>${videoMarca(marca)}</div>
       <div><div class="qr" style="margin:0 auto">${qrHtml||'<span class="small muted">QR indisponível sem internet.</span>'}</div>
