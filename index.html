@@ -1114,10 +1114,13 @@ const iaModelo = () => S.cfg.iaModelo||IA.modelo||'qwen/qwen3.8-27b';
 // modelos de visão do Groq, do preferido para o reserva (o Groq às vezes aposenta um modelo)
 const IA_VISAO=['qwen/qwen3.8-27b','qwen/qwen3.6-27b','meta-models/muse-spark-open','meta-llama/llama-4-scout-17b-16e-instruct'];
 async function iaChamar(modelo,prompt,imagens,semJson=false,maxTok=700){
-  return fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',
+  const ctrl=new AbortController(), to=setTimeout(()=>ctrl.abort(),25000);
+  try{ return await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',signal:ctrl.signal,
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+iaChave()},
     body:JSON.stringify({model:modelo,temperature:0,max_tokens:maxTok,...(/qwen3\.?8/i.test(modelo)?{reasoning_effort:'none'}:{}),...(semJson?{}:{response_format:{type:'json_object'}}),
-      messages:[{role:'user',content:[{type:'text',text:prompt},...imagens.map(u=>({type:'image_url',image_url:{url:u}}))]}]})});
+      messages:[{role:'user',content:[{type:'text',text:prompt},...imagens.map(u=>({type:'image_url',image_url:{url:u}}))]}]})}); }
+  catch(e){ if(e.name==='AbortError') throw new Error('a IA demorou mais de 25s para responder'); throw e; }
+  finally{ clearTimeout(to); }
 }
 // procura na conta do Groq um modelo que leia imagens, quando o configurado não existe mais
 async function iaAcharModelo(){
