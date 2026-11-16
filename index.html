@@ -1880,7 +1880,7 @@ async function passoTrava(){
         </div>
     </div>
     <div class="row mt" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn" data-act="imprimirContrato" data-id="${v.id}">Imprimir contrato</button>
-      ${can('DONO','FINANCEIRO','GERENTE')?`<button class="btn red" data-act="deixarPendente" data-id="${v.id}">Cancelar venda (cliente fica pendente)</button>`:'<span class="small muted" style="align-self:center">Para cancelar esta venda, chame o gerente.</span>'}</div>
+      ${can('DONO','FINANCEIRO','GERENTE')?`<button class="btn red" data-act="deixarPendente" data-id="${v.id}">Cancelar venda</button>`:'<span class="small muted" style="align-self:center">Para cancelar esta venda, chame o gerente.</span>'}</div>
       <button class="btn gold lg" id="btnConcluir" data-act="novaProposta" disabled title="Liberado quando a trava subir">Concluir venda</button></div>
 `;
   if(!(S.cfg.videos||{})[marca]) animarGuia(marca);
