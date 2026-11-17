@@ -8461,6 +8461,7 @@ function vrPrep(id){ try{ return JSON.parse(localStorage.getItem(vrPrepKey(id))|
 function vrPrepSalvar(id,o){ try{ localStorage.setItem(vrPrepKey(id),JSON.stringify(o)); }catch(e){} }
 function vrPrepPronta(p){ return !!(p.reset&&p.google&&p.tela); }
 function vrCardPrep(v){
+  return ''; // cartão "prepare o aparelho" retirado a pedido
   if(!v||v.aparelho?.semTrava||(v.aparelho&&ehIphone(v.aparelho))) return '';
   const p=vrPrep(v.id), ok=vrPrepPronta(p);
   const it=(k,t)=>`<label class="check"><input type="checkbox" data-vrprep="${k}" ${p[k]?'checked':''}> <span>${t}</span></label>`;
