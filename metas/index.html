@@ -53,31 +53,68 @@
     .adl-side{background:transparent;min-height:100dvh;padding:24px}
     .lbox{background:rgba(255,255,255,.98);border-radius:20px;padding:26px 22px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
   }
-  /* ===== APP ===== */
-  #app{max-width:640px;margin:0 auto;padding:0 14px 40px}
-  .top{position:sticky;top:0;z-index:5;background:var(--navy);color:#fff;margin:0 -14px 0;padding:14px 16px;border-radius:0 0 18px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-  .top .who{font-weight:700;font-size:15px}
-  .top .role{font-size:12px;color:#B7C2D9}
-  .monthnav{display:flex;align-items:center;justify-content:center;gap:14px;margin:16px 0 2px}
-  .monthnav b{font-size:16px;text-transform:capitalize}
-  .mbtn{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--navy);font-size:18px;cursor:pointer;display:grid;place-items:center}
-  .mbtn:disabled{opacity:.35}
-  .empty{text-align:center;color:var(--muted);padding:40px 20px}
-  .spin{width:30px;height:30px;border:3px solid var(--line);border-top-color:var(--blue);border-radius:50%;animation:sp 1s linear infinite;margin:40px auto}
+  /* ===== APP (padrão NexumCell: topo azul, cartão sobreposto) ===== */
+  #app{max-width:640px;margin:0 auto;padding:0 0 40px;min-height:100dvh}
+  .top{background:linear-gradient(135deg,#0A1733,#12306B 55%,#1D4ED8);color:#fff;padding:calc(14px + env(safe-area-inset-top)) 18px 84px;border-radius:0 0 28px 28px}
+  .top-bar{display:flex;align-items:center;gap:10px}
+  .top-bar .logo{width:30px;height:30px;border-radius:8px;background:#fff;color:#1D4ED8;display:grid;place-items:center;font-weight:800;font-size:16px}
+  .top-bar .marca{flex:1;font-weight:600;font-size:16px}
+  .ibtn{width:38px;height:38px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;display:grid;place-items:center;cursor:pointer}
+  .ibtn svg{width:18px;height:18px}
+  .ola{font-size:23px;font-weight:700;margin-top:16px}
+  .ola-sub{color:#C7D5F5;font-size:13.5px;margin-top:2px}
+  .monthnav{display:flex;align-items:center;gap:10px;margin-top:14px}
+  .monthnav b{font-size:15px;flex:1;text-align:center}
+  .mbtn{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:18px;cursor:pointer;display:grid;place-items:center}
+  .mbtn:disabled{opacity:.3}
+  #conteudo{padding:0 16px;margin-top:-64px;position:relative}
+  .card{background:#fff;border:1px solid #E5E9F2;border-radius:20px;padding:18px;margin:0 0 14px;box-shadow:0 4px 14px rgba(15,23,42,.05)}
+  .hero{box-shadow:0 10px 30px rgba(10,23,51,.12)}
+  .hero .lbl{font-size:13px;color:#475569}
+  .hero .big{font-size:34px;font-weight:800;letter-spacing:-.02em;color:#0E9F6E;margin-top:2px}
+  .hero .de{font-size:13.5px;color:#64748B}
+  .chip{display:inline-block;font-size:12px;font-weight:600;padding:5px 10px;border-radius:99px}
+  .c-v{background:#E7F7F0;color:#0E9F6E}.c-a{background:#EAF0FF;color:#1D4ED8}.c-r{background:#FDECEC;color:#DC2626}.c-l{background:#FEF3E2;color:#B45309}
+  .linha{display:flex;align-items:center;gap:10px}
+  .esp{flex:1}
+  .pb{height:8px;border-radius:6px;background:#EDF1F7;overflow:hidden;margin-top:10px}.pb i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#0E9F6E,#10B981)}
+  .div{height:1px;background:#E5E9F2;margin:16px 0}
+  .tri{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+  .tri small{display:block;font-size:12px;color:#94A3B8}.tri b{display:block;font-size:17px;margin-top:3px}
+  .sec{font-size:16px;font-weight:700;margin:20px 2px 10px;color:#0F172A}
+  .ind{display:flex;align-items:center;gap:14px;padding:14px 0;border-top:1px solid #EEF1F7}
+  .ind:first-child{border-top:0;padding-top:4px}
+  .ind .anel{width:54px;height:54px;flex:none;position:relative}
+  .ind .anel svg{width:54px;height:54px;transform:rotate(-90deg)}
+  .ind .anel span{position:absolute;inset:0;display:grid;place-items:center;font-size:12.5px;font-weight:700}
+  .ind .meio{flex:1;min-width:0}.ind .meio b{display:block;font-size:15px}.ind .meio small{display:block;font-size:13px;color:#475569;margin-top:2px}
+  .ind .fim{text-align:right}.ind .fim b{display:block;font-size:16px}
+  .ritmo{display:flex;gap:12px;align-items:flex-start;background:#F5F8FF;border:1px solid #CFE0FF;border-radius:16px;padding:14px 16px;font-size:13.5px;color:#1E293B}
+  .ritmo svg{flex:none;margin-top:2px}
+  .regra{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid #EEF1F7}
+  .regra:first-of-type{border-top:0}
+  .regra .ok{width:24px;height:24px;border-radius:50%;flex:none;display:grid;place-items:center;border:1.5px solid #D6DDEB}
+  .regra .ok.on{background:#0E9F6E;border-color:#0E9F6E}
+  .regra .t{flex:1}.regra .t b{display:block;font-size:14px}.regra .t small{color:#64748B;font-size:12.5px}
+  .regra .v{font-weight:800;font-size:14.5px}
+  .dica{background:#F3F5FA;border-radius:12px;padding:12px 14px;font-size:13px;color:#334155;margin-top:12px}
+  .btn-ver{display:block;width:100%;text-align:center;margin-top:14px;padding:12px;border-radius:12px;border:1px solid #D6DDEB;background:#fff;color:#1D4ED8;font-weight:600;font-size:14.5px;cursor:pointer}
+  .empty{text-align:center;color:#64748B;padding:28px 12px}
+  .spin{width:30px;height:30px;border:3px solid #E5E9F2;border-top-color:#1D4ED8;border-radius:50%;animation:sp 1s linear infinite;margin:40px auto}
   @keyframes sp{to{transform:rotate(360deg)}}
-  .inst{position:fixed;left:14px;right:14px;bottom:14px;max-width:612px;margin:0 auto;background:var(--navy2);color:#fff;border-radius:14px;padding:12px 14px;display:flex;gap:12px;align-items:center;z-index:30;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-  .inst .x{margin-left:auto;background:0;border:0;color:#9fb0cf;font-size:20px;cursor:pointer}
-  .modal{position:fixed;inset:0;background:rgba(10,23,51,.55);display:flex;align-items:center;justify-content:center;padding:18px;z-index:50}
-  .modal-card{background:#fff;border-radius:18px;padding:22px;max-width:390px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:90vh;overflow:auto}
-  .bnbig{font-size:42px;font-weight:800;color:var(--good);text-align:center;line-height:1.1}
-  .bntit{text-align:center;font-size:14px;font-weight:700;color:var(--navy);margin-bottom:2px}
-  .bnsub{text-align:center;color:var(--muted);font-size:13px;margin-top:4px}
-  .bnpaid{text-align:center;color:var(--good);font-weight:700;font-size:13.5px;margin-top:8px;background:var(--goodbg);border-radius:8px;padding:7px}
-  .bnwait{text-align:center;color:#1D4ED8;font-weight:700;font-size:13.5px;margin-top:8px;background:var(--midbg);border-radius:8px;padding:7px}
-  .bnlist{margin-top:14px;border-top:1px solid var(--line)}
-  .bnrow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F0F3F9;font-size:14px}
-  .bnrow .on{color:var(--good);font-weight:800}
-  .bnrow .off{color:var(--muted)}
+  .modal{position:fixed;inset:0;background:rgba(10,23,51,.55);display:flex;align-items:flex-end;justify-content:center;z-index:50;backdrop-filter:blur(3px)}
+  .modal-card{background:#fff;border-radius:24px 24px 0 0;padding:12px 22px calc(22px + env(safe-area-inset-bottom));max-width:640px;width:100%;max-height:90dvh;overflow:auto;animation:sobe .22s ease-out}
+  @keyframes sobe{from{transform:translateY(40px);opacity:.4}}
+  .puxa{width:40px;height:5px;border-radius:3px;background:#D6DDEB;margin:0 auto 14px}
+  .bnbig{font-size:40px;font-weight:800;color:#0E9F6E;text-align:center;line-height:1.1}
+  .bntit{text-align:center;font-size:14px;color:#475569;margin-bottom:4px}
+  .bnsub{text-align:center;color:#64748B;font-size:12.5px;margin-top:12px}
+  .bnpaid{text-align:center;color:#0E9F6E;font-weight:600;font-size:13.5px;margin-top:10px;background:#E7F7F0;border-radius:10px;padding:8px}
+  .bnwait{text-align:center;color:#1D4ED8;font-weight:600;font-size:13.5px;margin-top:10px;background:#EAF0FF;border-radius:10px;padding:8px}
+  .bnlist{margin-top:14px}
+  .bnrow{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-top:1px solid #EEF1F7;font-size:14px}
+  .bnrow .on{color:#0E9F6E;font-weight:700}.bnrow .off{color:#94A3B8}
+  .btn.full{width:100%;margin-top:16px;border-radius:14px;padding:14px}
 </style>
 </head>
 <body>
@@ -122,16 +159,11 @@
 <!-- ===================== APP ===================== -->
 <main id="app" class="hidden">
   <div class="top">
-    <div><div class="who" id="meNome">—</div><div class="role" id="meRole"></div></div>
-    <div style="display:flex;gap:8px">
-      <button class="btn sm" id="bBonus" style="background:#15754A;color:#fff;border-color:#15754A">Bônus</button>
-      <button class="btn sm" id="bSair" style="background:#16305e;color:#fff;border-color:#2c436f">Sair</button>
-    </div>
-  </div>
-  <div class="monthnav">
-    <button class="mbtn" id="mPrev">‹</button>
-    <b id="mLabel">—</b>
-    <button class="mbtn" id="mNext">›</button>
+    <div class="top-bar"><div class="logo">N</div><div class="marca">Minhas Metas</div>
+      <button class="ibtn" id="bSair" title="Sair"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg></button></div>
+    <div class="ola" id="meNome">Olá!</div>
+    <div class="ola-sub" id="meRole"></div>
+    <div class="monthnav"><button class="mbtn" id="mPrev">‹</button><b id="mLabel">—</b><button class="mbtn" id="mNext">›</button></div>
   </div>
   <div id="conteudo"><div class="spin"></div></div>
   <div id="modal" class="modal hidden"><div class="modal-card" id="modalBody"></div></div>
@@ -208,58 +240,69 @@ function metasBonus(feito,metaV,ativos,bonus){
   r.exig=exig; r.bate=bate; r.integralBate=integralBate; r.todos=todos;
   return r;
 }
-function metaRing(feito,meta,lbl,money){
-  const fr=meta>0?feito/meta:0, pct=Math.min(100,Math.round(fr*100)), R=37,C=2*Math.PI*R, off=C*(1-Math.min(1,fr));
-  const cor=fr>=1?'#15754A':fr>=.5?'#1D4ED8':'#9A2A2A';
-  const vt=money?(Math.round(feito/1000)+'k'):feito, mt=money?brl(meta):meta;
-  const pz=fr>=1?['#E7F3EC','#15754A','Batida']:fr>=.5?['#E9F0FF','#1D4ED8','No ritmo']:['#F6E8E8','#9A2A2A','Abaixo'];
-  return `<div style="border:1px solid #E4E8F0;border-radius:12px;padding:12px 6px;text-align:center">
-    <div style="position:relative;width:84px;height:84px;margin:0 auto">
-      <svg viewBox="0 0 84 84" style="width:84px;height:84px;transform:rotate(-90deg)"><circle cx="42" cy="42" r="${R}" fill="none" stroke="#EDF0F6" stroke-width="8"/><circle cx="42" cy="42" r="${R}" fill="none" stroke="${cor}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${off}"/></svg>
-      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-size:19px;font-weight:800;color:${cor}">${vt}</div><div style="font-size:11px;font-weight:700;color:#64708A">${pct}%</div></div></div>
-    <div style="font-weight:700;font-size:13px;margin-top:8px">${esc(lbl)}</div>
-    <div style="color:#64708A;font-size:11.5px">de ${mt}</div>
-    <div style="font-size:10.5px;font-weight:700;border-radius:5px;padding:2px 8px;display:inline-block;margin-top:7px;text-transform:uppercase;background:${pz[0]};color:${pz[1]}">${pz[2]}</div>
-  </div>`;
-}
+function anel(fr,cor){ const R=23,C=2*Math.PI*R, off=C*(1-Math.min(1,fr));
+  return `<svg viewBox="0 0 54 54"><circle cx="27" cy="27" r="${R}" fill="none" stroke="#EDF1F7" stroke-width="6"/><circle cx="27" cy="27" r="${R}" fill="none" stroke="${cor}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${off}"/></svg>`; }
+const OK_SVG='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+function diasRestantes(mes){ if(mes!==hoje().slice(0,7)) return 0; const h=new Date(), dim=new Date(h.getFullYear(),h.getMonth()+1,0).getDate(); return dim-h.getDate()+1; }
 async function cardMinhasMetas(uid,mes,vendas){
   const {ativos,metasV,bonus}=await metasDoc(mes);
   const mv=metasV[uid]||{}, feito=calcMetas(uid,mes,vendas);
-  const ind=MET_IND.filter(m=>ativos[m.k]);
-  if(!ind.length) return `<div class="card"><div class="empty">As metas deste mês ainda não foram definidas pela NexumCell.</div></div>`;
-  const rings=ind.map(m=>metaRing(feito[m.k]||0, +mv[m.k]||0, m.lbl, m.money)).join('');
+  const ind=MET_IND.filter(m=>ativos[m.k]&&(+mv[m.k]||0)>0);
+  if(!MET_IND.some(m=>ativos[m.k])||!ind.length) return `<div class="card hero"><div class="empty"><b style="display:block;color:#0F172A;font-size:16px;margin-bottom:4px">Metas ainda não definidas</b>As metas de ${esc(mesNome(mes))} ainda não foram definidas pela NexumCell.</div></div>`;
   const b=metasBonus(feito,mv,ativos,bonus);
-  const pj=metasProj(feito.aparelhos,mes), pf=metasProj(feito.faturamento,mes);
-  const alvos=b.todos.length, batidos=b.todos.filter(b.bate).length;
-  const proj=pj!=null?`<div style="display:flex;align-items:center;gap:12px;background:#0B1E3F;color:#fff;border-radius:12px;padding:14px 16px;margin-top:12px">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4D8DFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg>
-    <div style="font-size:13.5px">No ritmo atual, você fecha o mês com <b style="color:#4D8DFF">${pj} aparelhos</b>${ativos.faturamento?` e <b style="color:#4D8DFF">${brl(pf)}</b>`:''}.<div style="color:#B7C2D9;font-size:12px">Mantendo o ritmo, você bate <b style="color:#fff">${batidos} de ${alvos}</b> metas.</div></div></div>`:'';
-  const regra=(on,titulo,sub,valor)=>`<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid #E4E8F0">
-    <div style="width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center;border:1.5px solid ${on?'#15754A':'#E4E8F0'};background:${on?'#15754A':'#fff'}">${on?'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>':''}</div>
-    <div style="flex:1"><b style="font-size:13.5px">${titulo}</b><div style="color:#64708A;font-size:12px">${sub}</div></div>
-    <div style="font-weight:800;font-size:14px;color:${on?'#15754A':'#0B1E3F'}">${brl(valor)}</div></div>`;
-  let bonusHtml='';
-  if(bonus.aparelhos>0&&ativos.aparelhos) bonusHtml+=regra(b.aparelhos>0,'Meta de aparelhos',`${feito.aparelhos} de ${+mv.aparelhos||0}`,bonus.aparelhos);
-  if(bonus.acessoriosSeguros>0&&(ativos.acessorios||ativos.seguros)) bonusHtml+=regra(b.acessoriosSeguros>0,'Acessórios + seguros',`Acessórios ${feito.acessorios}/${+mv.acessorios||0} · Seguros ${feito.seguros}/${+mv.seguros||0}`,bonus.acessoriosSeguros);
-  if(bonus.parcelas>0&&ativos.parcelas) bonusHtml+=regra(b.parcelas>0,'Parcelas dos clientes em dia',`${feito.parcelas} de ${+mv.parcelas||0} no prazo`,bonus.parcelas);
-  if(bonus.integral>0) bonusHtml+=`<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;margin-top:6px;background:#EEF3FF;border:1px solid #C9D9F5;border-radius:10px">
-    <div style="width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center;border:1.5px solid ${b.integralBate?'#15754A':'#C9D9F5'};background:${b.integralBate?'#15754A':'#fff'}">${b.integralBate?'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>':''}</div>
-    <div style="flex:1"><b style="font-size:13.5px">Bateu TODAS as metas</b><div style="color:#64708A;font-size:12px">Bônus integral do mês</div></div>
-    <div style="font-weight:800;font-size:14px;color:#1D4ED8">${brl(bonus.integral)}</div></div>`;
   const totalPoss=(+bonus.aparelhos||0)+(+bonus.acessoriosSeguros||0)+(+bonus.parcelas||0)+(+bonus.integral||0);
-  const barra=totalPoss>0?`<div style="height:7px;background:#EDF0F6;border-radius:6px;overflow:hidden;margin-top:10px"><i style="display:block;height:100%;width:${Math.min(100,Math.round(b.total/totalPoss*100))}%;background:#1D4ED8;border-radius:6px"></i></div>
-    <div style="color:#64708A;font-size:12px;margin-top:5px">Você já garantiu <b style="color:#15754A">${brl(b.total)}</b> de ${brl(totalPoss)} em bônus este mês.</div>`:'';
-  const colab=ativos.parcelas?`<div style="background:#F0F4FA;border:1px solid #D7E1F0;border-radius:10px;padding:11px 14px;font-size:13px;color:#2B3A57;margin-top:12px">As parcelas em dia contam para o seu bônus. Acompanhe seus clientes e ajude a lembrar do vencimento — cliente em dia soma para você.</div>`:'';
-  const bonusCard=bonusHtml?`<div class="card"><h2 style="font-size:15px;margin:0 0 2px">Bônus do mês</h2><div class="muted" style="font-size:12px;margin-bottom:4px">Regras definidas pela Nexum</div>${bonusHtml}${barra}${colab}</div>`:'';
-  return `<div class="card"><h2 style="font-size:15px;margin:0">Minhas Metas</h2>
-    <div class="muted" style="font-size:12px;margin:2px 0 0">Seu progresso no mês — conta automático das suas vendas.</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:10px;margin-top:12px">${rings}</div>${proj}</div>${bonusCard}`;
+  const alvos=b.todos.length, batidos=b.todos.filter(b.bate).length;
+  const atual=mes===hoje().slice(0,7), dr=diasRestantes(mes);
+  const mil=v=>v>=1000?'R$ '+(Math.round(v/100)/10).toLocaleString('pt-BR')+' mil':brl(v);
+  const fmt=(m,v)=>m.money?mil(v):String(v);
+  // cartão principal: bônus garantido
+  const pctB=totalPoss>0?Math.min(100,Math.round(b.total/totalPoss*100)):0;
+  const status=alvos&&batidos===alvos?['c-v','Todas as metas batidas']:atual?['c-a',`${dr} ${dr===1?'dia':'dias'} para o fim do mês`]:['c-l','Mês encerrado'];
+  const hero=`<div class="card hero">
+    <div class="linha"><span class="chip ${status[0]}">${status[1]}</span></div>
+    <div class="lbl" style="margin-top:16px">${totalPoss>0?'Bônus garantido':'Metas batidas'}</div>
+    ${totalPoss>0?`<div class="big">${brl(b.total)}</div><div class="de">de ${brl(totalPoss)} possíveis neste mês</div><div class="pb"><i style="width:${Math.max(3,pctB)}%"></i></div>`
+      :`<div class="big" style="color:#1D4ED8">${batidos} de ${alvos}</div>`}
+    <div class="div"></div>
+    <div class="tri"><div><small>Aparelhos</small><b>${feito.aparelhos}</b></div><div><small>Faturamento</small><b>${mil(feito.faturamento)}</b></div><div><small>Metas batidas</small><b>${batidos}/${alvos}</b></div></div>
+    ${totalPoss>0?'<button class="btn-ver" id="bBonus2">Ver detalhes do bônus</button>':''}
+  </div>`;
+  // ritmo
+  const pj=metasProj(feito.aparelhos,mes), pf=metasProj(feito.faturamento,mes);
+  let ritmo='';
+  if(pj!=null){
+    const faltaAp=Math.max(0,(+mv.aparelhos||0)-feito.aparelhos);
+    const porDia=faltaAp>0&&dr>0?Math.ceil(faltaAp/dr*10)/10:0;
+    ritmo=`<div class="ritmo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg>
+      <div>No ritmo atual você fecha o mês com <b>${pj} ${pj===1?'aparelho':'aparelhos'}</b>${ativos.faturamento?` e <b>${brl(pf)}</b>`:''}.
+      ${faltaAp>0?`<div style="color:#475569;margin-top:4px">Faltam <b>${faltaAp}</b> para a meta de aparelhos: cerca de <b>${String(porDia).replace('.',',')} por dia</b> até o fim do mês.</div>`:(+mv.aparelhos||0)>0?'<div style="color:#0E9F6E;margin-top:4px;font-weight:600">Meta de aparelhos batida. Continue assim!</div>':''}</div></div>`;
+  }
+  // indicadores
+  const linhas=ind.map(m=>{ const f=+feito[m.k]||0, meta=+mv[m.k]||0, fr=meta>0?f/meta:0, pct=Math.min(999,Math.round(fr*100));
+    const [cor,chip,txt]=fr>=1?['#0E9F6E','c-v','Batida']:fr>=.5?['#1D4ED8','c-a','No ritmo']:['#DC2626','c-r','Abaixo'];
+    const falta=Math.max(0,r2(meta-f));
+    return `<div class="ind"><div class="anel">${anel(fr,cor)}<span style="color:${cor}">${Math.min(pct,100)}%</span></div>
+      <div class="meio"><b>${esc(m.lbl)}</b><small>${fmt(m,f)} de ${fmt(m,meta)}${falta>0?` · faltam ${fmt(m,falta)}`:''}</small></div>
+      <div class="fim"><span class="chip ${chip}">${txt}</span></div></div>`; }).join('');
+  // regras do bônus
+  const regra=(on,titulo,sub,valor)=>`<div class="regra"><div class="ok ${on?'on':''}">${on?OK_SVG:''}</div><div class="t"><b>${titulo}</b><small>${sub}</small></div><div class="v" style="color:${on?'#0E9F6E':'#0F172A'}">${brl(valor)}</div></div>`;
+  let regras='';
+  if(bonus.aparelhos>0&&ativos.aparelhos) regras+=regra(b.aparelhos>0,'Meta de aparelhos',`${feito.aparelhos} de ${+mv.aparelhos||0}`,bonus.aparelhos);
+  if(bonus.acessoriosSeguros>0&&(ativos.acessorios||ativos.seguros)) regras+=regra(b.acessoriosSeguros>0,'Acessórios + seguros',`Acessórios ${feito.acessorios}/${+mv.acessorios||0} · Seguros ${feito.seguros}/${+mv.seguros||0}`,bonus.acessoriosSeguros);
+  if(bonus.parcelas>0&&ativos.parcelas) regras+=regra(b.parcelas>0,'Parcelas dos clientes em dia',`${feito.parcelas} de ${+mv.parcelas||0} pagas no prazo`,bonus.parcelas);
+  if(bonus.integral>0) regras+=regra(b.integralBate,'Bateu todas as metas','Bônus integral do mês',bonus.integral);
+  const dica=ativos.parcelas?'<div class="dica">As parcelas pagas em dia pelos seus clientes também contam para o bônus. Lembre o cliente do vencimento.</div>':'';
+  return hero+ritmo.replace('<div class="ritmo">','<div class="ritmo" style="margin-bottom:14px">')
+    +`<div class="sec">Minhas metas</div><div class="card">${linhas}</div>`
+    +(regras?`<div class="sec">Como ganhar o bônus</div><div class="card">${regras}${dica}</div>`:'')
+    +`<p style="text-align:center;color:#94A3B8;font-size:12px;margin:6px 0 0">Conta automático das suas vendas. Metas e bônus definidos pela NexumCell.</p>`;
 }
 
 /* ===== Vendas do próprio funcionário ===== */
 async function minhasVendas(){ try{ return await DB.list('vendas',[['vendedorUid','==',S.me.uid]]); }catch(e){ console.warn(e); return []; } }
 
 /* ===== Bônus: quanto o funcionário recebe no dia do pagamento ===== */
+function fmtD(iso){ const [a,m,d]=String(iso||'').split('-'); return d?`${d}/${m}/${a}`:String(iso||''); }
 function abrirModal(html){ $('#modalBody').innerHTML=html; $('#modal').classList.remove('hidden'); }
 function fecharModal(){ $('#modal').classList.add('hidden'); }
 async function bonusDoMes(mes){
@@ -274,7 +317,7 @@ async function telaBonus(){
   abrirModal('<div class="spin"></div>');
   try{
     const {b,bonus,pago}=await bonusDoMes(S.mes);
-    const regra=(titulo,on,valor)=>`<div class="bnrow"><span class="${on?'':'off'}">${on?'✓ ':''}${titulo}</span><b class="${on?'on':'off'}">${brl(valor)}</b></div>`;
+    const regra=(titulo,on,valor)=>`<div class="bnrow"><span class="${on?'':'off'}">${titulo}</span><b class="${on?'on':'off'}">${brl(valor)}</b></div>`;
     const linhas=[];
     if(bonus.aparelhos>0) linhas.push(regra('Meta de aparelhos',b.aparelhos>0,bonus.aparelhos));
     if(bonus.acessoriosSeguros>0) linhas.push(regra('Acessórios + seguros',b.acessoriosSeguros>0,bonus.acessoriosSeguros));
@@ -282,28 +325,30 @@ async function telaBonus(){
     if(bonus.integral>0) linhas.push(regra('Bateu todas as metas',b.integralBate,bonus.integral));
     const det=linhas.length?`<div class="bnlist">${linhas.join('')}</div>`:`<p class="muted" style="text-align:center;margin:12px 0">As metas deste mês ainda não têm bônus definido pela Nexum.</p>`;
     const status = pago
-      ? `<div class="bnpaid">✓ Pago em ${fmtD(isoDate(new Date(pago.pagoEm)))}${pago.por?' · '+esc(pago.por):''}</div>`
+      ? `<div class="bnpaid">Pago em ${fmtD(isoDate(new Date(pago.pagoEm)))}${pago.por?' · '+esc(pago.por):''}</div>`
       : `<div class="bnwait">Você vai receber no dia do pagamento</div>`;
-    $('#modalBody').innerHTML=`
+    $('#modalBody').innerHTML=`<div class="puxa"></div>
       <div class="bntit">Seu bônus garantido</div>
       <div class="bnbig">${brl(b.total)}</div>
       ${status}
       ${det}
       <p class="bnsub">${mesNome(S.mes)} · conta automático das suas vendas. Regras definidas pela Nexum.</p>
-      <button class="btn" style="width:100%;margin-top:14px" onclick="fecharModal()">Fechar</button>`;
+      <button class="btn full" onclick="fecharModal()">Fechar</button>`;
   }catch(e){ $('#modalBody').innerHTML=`<div class="empty">Não foi possível calcular o bônus agora.</div><button class="btn" style="width:100%" onclick="fecharModal()">Fechar</button>`; }
 }
 
 /* ===== Render ===== */
 async function render(){
-  $('#meNome').textContent=S.me.nome||'—';
-  $('#meRole').textContent=(ROLES[S.me.role]||S.me.role||'');
-  $('#mLabel').textContent=mesNome(S.mes);
+  const pn=String(S.me.nome||'').trim().split(/\s+/)[0]||'';
+  $('#meNome').textContent=pn?`Olá, ${pn}`:'Olá!';
+  $('#meRole').textContent=[(ROLES[S.me.role]||S.me.role||''),S.me.lojaNome||''].filter(Boolean).join(' · ');
+  $('#mLabel').textContent=mesNome(S.mes).replace(/^./,c=>c.toUpperCase());
   $('#mNext').disabled = S.mes >= hoje().slice(0,7);
   $('#conteudo').innerHTML='<div class="spin"></div>';
   try{
     const vendas=await minhasVendas(); S._vendas=vendas;
     $('#conteudo').innerHTML=await cardMinhasMetas(S.me.uid,S.mes,vendas);
+    const bb=$('#bBonus2'); if(bb) bb.onclick=telaBonus;
   }catch(e){
     $('#conteudo').innerHTML=`<div class="card"><div class="empty">Não foi possível carregar suas metas agora.<br><button class="btn sm" onclick="render()" style="margin-top:10px">Tentar de novo</button></div></div>`;
   }
@@ -400,7 +445,6 @@ $('#lOlho').onclick=()=>{ const i=$('#lSenha'); i.type=i.type==='password'?'text
 $('#lEsqueci').onclick=esqueciSenha;
 $('#bCriarSenha').onclick=criarSenhaPropria;
 $('#bSair').onclick=sair;
-$('#bBonus').onclick=telaBonus;
 $('#modal').onclick=e=>{ if(e.target.id==='modal') fecharModal(); };
 $('#mPrev').onclick=()=>{ S.mes=mesAdd(S.mes,-1); render(); };
 $('#mNext').onclick=()=>{ if(S.mes<hoje().slice(0,7)){ S.mes=mesAdd(S.mes,1); render(); } };
