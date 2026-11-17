@@ -8298,6 +8298,113 @@ Object.assign(ACT,{
 });
 
 window.__nx={S,DB,avaliar,payloadProvisionamento,telaRestrito,scriptInstPc:(...a)=>scriptInstPc(...a)};
+
+/* ===================== VENDA RÁPIDA (nov/2026) =====================
+   - Visual no mesmo padrão do app do cliente (azul #1D4ED8, cantos maiores, sombras suaves)
+   - Barra de progresso da venda com "Passo X de 8"
+   - "Adiante a trava": o vendedor prepara o aparelho (restauração de fábrica) enquanto o cliente assina e paga a entrada
+   - Trava: passo a passo curto sempre visível, QR em tela cheia (tela acesa), aviso sonoro + vibração quando a trava sobe
+     e cartão de venda concluída com "Nova venda"
+   - Entrada: lembra a última forma de pagamento usada */
+document.head.insertAdjacentHTML('beforeend',`<style id="vendaRapidaCss">
+:root{--pri:#1D4ED8;--pri-d:#1E40AF;--pri-s:#EAF0FF;--ok:#0E9F6E;--ok-s:#E7F7F0;--bad:#DC2626;--bad-s:#FDECEC;--warn:#B45309;--warn-s:#FEF3E2;
+  --bg:#F3F5FA;--line:#E5E9F2;--line2:#EEF1F7;--txt:#0F172A;--mut:#64748B;--r:16px;--rs:12px}
+.card{border-radius:18px;box-shadow:0 1px 2px rgba(15,23,42,.04),0 4px 14px rgba(15,23,42,.04)}
+.btn{border-radius:12px}.btn.lg{min-height:52px;border-radius:14px;font-size:16px}
+.btn.gold{box-shadow:0 4px 12px rgba(29,78,216,.22)}
+.badge{border-radius:99px}
+.vr-prog{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 16px;margin-bottom:14px;position:sticky;top:0;z-index:5;box-shadow:0 4px 14px rgba(15,23,42,.05)}
+.vr-prog .l{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--mut)}
+.vr-prog .l b{font-size:15px;color:var(--txt)}
+.vr-prog .bar{height:8px;border-radius:6px;background:#EDF1F7;margin-top:8px;overflow:hidden}
+.vr-prog .bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#1D4ED8,#3B82F6);transition:width .3s}
+@media(max-width:700px){.stepper{display:none}}
+.vr-prep{border:1px solid #CFE0FF;background:linear-gradient(180deg,#F5F8FF,#fff);border-radius:18px;padding:16px 18px;margin-bottom:14px}
+.vr-prep h3{margin:0 0 4px;font-size:15px;display:flex;align-items:center;gap:8px}
+.vr-prep p{margin:0 0 10px;font-size:13px;color:var(--mut)}
+.vr-prep label.check{font-weight:500;color:var(--txt);font-size:14px;flex-direction:row;align-items:center;gap:10px;padding:6px 0}
+.vr-prep.ok{border-color:#BFE8D6;background:linear-gradient(180deg,#F1FBF6,#fff)}
+.vr-passos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.vr-passos div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:13px;color:var(--mut)}
+.vr-passos div b{display:block;color:var(--txt);font-size:14px}
+.vr-passos div i{font-style:normal;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--pri-s);color:var(--pri);font-weight:700;font-size:12px;margin-bottom:6px}
+.vr-passos div.ok i{background:var(--ok-s);color:var(--ok)}
+@media(max-width:600px){.vr-passos{grid-template-columns:1fr}}
+.vr-qrfull{position:fixed;inset:0;background:#fff;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center}
+.vr-qrfull svg{width:min(88vw,70vh);height:auto}
+.vr-qrfull h3{margin:0 0 4px;font-size:18px}.vr-qrfull p{margin:0 0 14px;color:var(--mut);font-size:14px}
+.vr-fim{border-radius:18px;padding:22px;background:linear-gradient(135deg,#0E9F6E,#10B981);color:#fff;margin-bottom:14px;text-align:center}
+.vr-fim b{display:block;font-size:22px}.vr-fim p{margin:6px 0 14px;opacity:.95}
+.vr-fim .btn{background:#fff;color:#0E9F6E;border-color:#fff}.vr-fim .btn.sec{background:transparent;color:#fff;border-color:rgba(255,255,255,.6)}
+</style>`);
+
+/* barra de progresso acima do passo a passo */
+{ const _st=stepper; stepper=function(){ const p=S.w.passo, n=PASSOS.length, pct=Math.round((p-1)/(n-1)*100);
+  return `<div class="vr-prog"><div class="l"><span>Passo ${p} de ${n}</span><b>${PASSOS[p-1]}</b><span>${pct}%</span></div><div class="bar"><i style="width:${Math.max(4,pct)}%"></i></div></div>`+_st(); }; }
+
+/* preparação do aparelho em paralelo (fica salva por venda neste navegador) */
+const vrPrepKey=id=>'nxc_prep_'+id;
+function vrPrep(id){ try{ return JSON.parse(localStorage.getItem(vrPrepKey(id))||'{}'); }catch(e){ return {}; } }
+function vrPrepSalvar(id,o){ try{ localStorage.setItem(vrPrepKey(id),JSON.stringify(o)); }catch(e){} }
+function vrPrepPronta(p){ return !!(p.reset&&p.google&&p.tela); }
+function vrCardPrep(v){
+  if(!v||v.aparelho?.semTrava||(v.aparelho&&ehIphone(v.aparelho))) return '';
+  const p=vrPrep(v.id), ok=vrPrepPronta(p);
+  const it=(k,t)=>`<label class="check"><input type="checkbox" data-vrprep="${k}" ${p[k]?'checked':''}> <span>${t}</span></label>`;
+  return `<div class="vr-prep ${ok?'ok':''}" id="vrPrep"><h3>${svg(ok?'<path d="M20 6 9 17l-5-5"/>':'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>')}${ok?'Aparelho pronto para a trava':'Ganhe tempo: prepare o aparelho agora'}</h3>
+    <p>${ok?'Na etapa da trava é só tocar 6 vezes na tela de boas-vindas e ler o QR.':'Enquanto o cliente assina e paga a entrada, deixe o '+esc(apNome(v))+' pronto. Assim a trava sobe em poucos minutos.'}</p>
+    ${it('reset','Restaurei o aparelho de fábrica')}${it('google','Não fiz login em conta Google')}${it('tela','O aparelho está ligado na tela de boas-vindas')}</div>`;
+}
+document.addEventListener('change',e=>{ const k=e.target?.dataset?.vrprep; if(!k||!S.w?.vendaId) return;
+  const p=vrPrep(S.w.vendaId); p[k]=e.target.checked; vrPrepSalvar(S.w.vendaId,p);
+  const box=$('#vrPrep'); if(box&&vrPrepPronta(p)){ box.classList.add('ok'); toast('Aparelho pronto. Na etapa da trava é só ler o QR.','ok'); } });
+async function vrInserirPrep(){ try{ const v=await DB.get('vendas',S.w.vendaId); const html=vrCardPrep(v); if(html&&$('#wz')&&!$('#vrPrep')) $('#wz').insertAdjacentHTML('afterbegin',html); }catch(e){ console.warn('prep',e); } }
+{ const _pc=passoContrato; passoContrato=async function(...a){ const r=await _pc.apply(this,a); await vrInserirPrep(); return r; }; }
+{ const _pe=passoEntrada; passoEntrada=async function(...a){ const r=await _pe.apply(this,a); await vrInserirPrep(); return r; }; }
+
+/* entrada: lembra a última forma de pagamento */
+{ const _pe=passoEntrada; passoEntrada=async function(...a){ const r=await _pe.apply(this,a);
+    const sel=$('#eForma'); if(sel){ const f=localStorage.getItem('nxc_forma'); if(f&&[...sel.options].some(o=>o.value===f)) sel.value=f; sel.addEventListener('change',()=>localStorage.setItem('nxc_forma',sel.value)); }
+    return r; }; }
+
+/* trava: passos curtos, QR em tela cheia e aviso quando sobe */
+let vrWake=null;
+async function vrTelaAcesa(){ try{ vrWake=await navigator.wakeLock?.request('screen'); }catch(e){} }
+function vrSom(){ try{ const c=new (window.AudioContext||window.webkitAudioContext)(); [0,0.18].forEach((t,i)=>{ const o=c.createOscillator(), g=c.createGain(); o.frequency.value=i?1046:784; o.connect(g); g.connect(c.destination); g.gain.setValueAtTime(.18,c.currentTime+t); g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t+.25); o.start(c.currentTime+t); o.stop(c.currentTime+t+.26); }); }catch(e){} try{ navigator.vibrate?.([120,80,120]); }catch(e){} }
+function vrQrTelaCheia(v){
+  const json=payloadProvisionamento(v.aparelhoToken,v.lojaId); let qr='';
+  try{ const q=qrcode(0,'L'); q.addData(json,'Byte'); q.make(); qr=q.createSvgTag({cellSize:8,margin:4,scalable:true}); }catch(e){ return toast('Não foi possível gerar o QR','err'); }
+  const el=document.createElement('div'); el.className='vr-qrfull';
+  el.innerHTML=`<h3>Contrato nº ${v.numero} · ${esc(apNome(v))}</h3><p>Na tela de boas-vindas, toque 6 vezes, conecte no Wi-Fi e aponte a câmera para este QR.</p>${qr}<button class="btn lg gold" style="margin-top:18px;min-width:220px">Fechar</button>`;
+  el.querySelector('button').onclick=()=>{ el.remove(); try{ vrWake?.release(); }catch(e){} };
+  document.body.appendChild(el); vrTelaAcesa();
+}
+{ const _pt=passoTrava; passoTrava=async function(...a){
+  const r=await _pt.apply(this,a);
+  try{
+    const v=await DB.get('vendas',S.w.vendaId); const st=$('#instStatus');
+    if(!v||!st||v.aparelho?.semTrava||ehIphone(v.aparelho)) return r;
+    vrTelaAcesa();
+    const p=vrPrep(v.id), pronto=vrPrepPronta(p);
+    const card=$('#wz .card'); const h2=card?.querySelector('h2');
+    if(h2) h2.insertAdjacentHTML('afterend',`<div class="vr-passos">
+      <div class="${pronto?'ok':''}"><i>${pronto?'✓':'1'}</i><b>Restaurar de fábrica</b>Sem conta Google</div>
+      <div><i>2</i><b>Tocar 6 vezes</b>Na tela de boas-vindas e conectar no Wi-Fi</div>
+      <div><i>3</i><b>Ler o QR</b>A confirmação fica verde sozinha</div></div>`);
+    const qrBox=card?.querySelector('.qr');
+    if(qrBox) qrBox.insertAdjacentHTML('afterend',`<div style="text-align:center;margin-top:10px"><button class="btn gold" id="vrQrBtn">${svg('<path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h3v3h-3zM18 18h3v3h-3z"/>')}Mostrar QR em tela cheia</button></div>`);
+    $('#vrQrBtn')?.addEventListener('click',()=>vrQrTelaCheia(v));
+    // quando a trava sobe: som, vibração e cartão de venda concluída no topo
+    let avisou=false;
+    const obs=new MutationObserver(()=>{ if(avisou||!st.isConnected){ if(!st.isConnected) obs.disconnect(); return; }
+      if(st.classList.contains('ok')){ avisou=true; obs.disconnect(); vrSom(); try{ localStorage.removeItem(vrPrepKey(v.id)); }catch(e){}
+        $('#wz').insertAdjacentHTML('afterbegin',`<div class="vr-fim"><b>Venda concluída</b><p>A trava subiu no ${esc(apNome(v))}. Pode entregar o aparelho ao cliente.</p>
+          <div class="row" style="justify-content:center"><button class="btn lg" data-act="novaProposta">Nova venda</button><button class="btn lg sec" data-act="imprimirContrato" data-id="${v.id}">Imprimir contrato</button></div></div>`);
+        $('.content')&&($('.content').scrollTop=0); } });
+    obs.observe(st,{attributes:true,attributeFilter:['class']});
+  }catch(e){ console.warn('trava rápida',e); }
+  return r; }; }
+
 </script>
 </body>
 </html>
