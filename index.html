@@ -10654,6 +10654,49 @@ async function acFaixa(){
 }
 { const _r=render; render=async(...a)=>{ const r=await _r(...a); if(['inicio','painel'].includes(S.tab)) acFaixa(); return r; }; }
 
+/* ===================== MINHA CARTEIRA, LINK DE VENDAS E RASCUNHO DA VENDA (nov/2026) ===================== */
+if (['vendedor', 'gerente'].includes(PORTAL)) {
+  IC.carteira = '<path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>';
+  TABS.push({ id: 'carteira', label: 'Minha carteira', roles: ['VENDEDOR', 'GERENTE', 'DONO'] });
+  if (!P.tabs.includes('carteira')) P.tabs.splice(Math.max(0, P.tabs.indexOf('vendas') + 1), 0, 'carteira');
+  const g = NAV_GRUPOS.find(x => x[0] === 'Vendas'); if (g && !g[1].includes('carteira')) g[1].splice(g[1].indexOf('vendas') + 1, 0, 'carteira');
+}
+const lnNx = id => { const n = lojaNome(id); return n && n !== '—' ? n : 'NexumCell'; };
+const linkVendas = () => new URL('seja-cliente.html', urlCliente()).href + `?v=${encodeURIComponent(S.me.uid)}&vn=${encodeURIComponent(primeiroNome(S.me.nome) + (S.me.lojaId ? ' · ' + lojaNome(S.me.lojaId) : ''))}${S.me.lojaId ? '&l=' + encodeURIComponent(S.me.lojaId) : ''}`;
+PAGES.carteira = async () => {
+  const vs = (await loadVendas()).filter(v => !['REPROVADA', 'CANCELADA', 'RASCUNHO'].includes(v.status)), h = hoje(), seis = Date.now() - 183 * 864e5;
+  const emDia = v => !(v.parcelas || []).some(p => !p.pago && p.venc < h), faltam = v => (v.parcelas || []).filter(p => !p.pago).length;
+  const perto = vs.filter(v => v.status === 'ATIVA' && emDia(v) && faltam(v) <= 2 && (v.parcelas || []).length >= 3).sort((a, b) => faltam(a) - faltam(b));
+  const quit = vs.filter(v => v.status === 'QUITADA' && (v.quitadoEm || v.atualizadoEm || v.criadoEm) >= seis);
+  const atras = vs.filter(v => v.status === 'ATIVA' && !emDia(v)).sort((a, b) => (a.parcelas.find(p => !p.pago)?.venc || '').localeCompare(b.parcelas.find(p => !p.pago)?.venc || ''));
+  const pre = {}; await Promise.all([...new Set([...perto, ...quit].map(v => v.clienteCpf))].slice(0, 40).map(c => DB.get('clientes', c).then(x => { if (x?.preAprovado?.ate >= h) pre[c] = x.preAprovado; }).catch(() => { })));
+  const tel = v => onlyDig((v.cliente?.telefones || [])[0] || v.clienteTel1 || ''), wa = (v, msg) => { const t = tel(v); return t.length >= 10 ? `https://wa.me/${t.startsWith('55') ? t : '55' + t}?text=${encodeURIComponent(msg)}` : ''; };
+  const ofer = v => `Olá, ${primeiroNome(v.clienteNome)}! Aqui é ${primeiroNome(S.me.nome)}, da ${lnNx(v.lojaId)}. Você ${v.status === 'QUITADA' ? 'quitou' : 'está quase quitando'} o seu ${[v.aparelho?.marca, v.aparelho?.modelo].filter(Boolean).join(' ') || 'celular'} e pagou tudo em dia${pre[v.clienteCpf]?.valor ? `: você tem crédito pré-aprovado de até ${brl(pre[v.clienteCpf].valor)} para trocar de aparelho` : ''}. Quer ver os modelos novos? Faça a simulação aqui: ${linkVendas()}`;
+  const linha = (v, extra, msg) => { const u = wa(v, msg); return `<tr><td><b>${esc(v.clienteNome)}</b><br><span class="small muted">${esc([v.aparelho?.marca, v.aparelho?.modelo].filter(Boolean).join(' '))} · nº ${v.numero}</span></td><td>${extra}</td><td>${pre[v.clienteCpf] ? badge('Pré-aprovado ' + brl(pre[v.clienteCpf].valor), 'green') : '<span class="small muted">—</span>'}</td><td class="right">${u ? `<a class="btn sm gold" target="_blank" rel="noopener" href="${u}">WhatsApp</a>` : '<span class="small muted">sem telefone</span>'}</td></tr>`; };
+  const tab = (t, sub, l, cab, fn) => `<div class="card mt"><h2 style="margin:0">${t}</h2><p class="small muted" style="margin:2px 0 10px">${sub}</p>${l.length ? `<div class="tablewrap"><table><tr><th>Cliente</th><th>${cab}</th><th>Crédito</th><th></th></tr>${l.slice(0, 60).map(fn).join('')}</table></div>` : '<p class="empty">Ninguém aqui agora.</p>'}</div>`;
+  $('#topActions').innerHTML = '';
+  $('#view').innerHTML = `<div class="card" style="background:linear-gradient(135deg,#0A1733,#16306B);color:#fff;border:0"><div class="row" style="justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center"><div><small style="opacity:.75;text-transform:uppercase;letter-spacing:.08em">Meu link de vendas</small><h2 style="margin:2px 0 4px;color:#fff">Página "Seja cliente" com o seu nome</h2><p style="margin:0;opacity:.8;font-size:14px">Mande no WhatsApp, no status ou no Instagram. Quem fizer a pré-análise pelo link cai direto para você.</p></div>
+      <div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn" data-act="cartLink">Copiar link</button><a class="btn gold" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent('Celular novo parcelado, com resposta na hora e sem consulta ao SPC/Serasa. Faça sua pré-análise grátis: ' + linkVendas())}">Mandar no WhatsApp</a></div></div></div>
+    <div class="kpis mt"><div class="kpi"><small>Perto de quitar</small><b>${perto.length}</b></div><div class="kpi"><small>Quitaram (6 meses)</small><b>${quit.length}</b></div><div class="kpi"><small>Com pré-aprovado</small><b>${Object.keys(pre).length}</b></div><div class="kpi"><small>Em atraso</small><b style="color:${atras.length ? 'var(--bad)' : ''}">${atras.length}</b></div></div>
+    ${tab('Perto de quitar: ofereça um aparelho novo', 'Pagam em dia e faltam até 2 parcelas. É o melhor momento para a recompra.', perto, 'Faltam', v => linha(v, `${faltam(v)} parcela(s)`, ofer(v)))}
+    ${tab('Quitaram nos últimos 6 meses', 'Clientes que já confiam na loja. Uma mensagem por mês, no máximo.', quit, 'Situação', v => linha(v, badge('Quitado', 'green'), ofer(v)))}
+    ${tab('Em atraso', 'Um lembrete educado de quem vendeu ajuda muito. Não prometa desconto: a cobrança combina com o cliente.', atras, 'Atraso', v => { const p = v.parcelas.find(x => !x.pago); return linha(v, badge('desde ' + fmtD(p.venc), 'red'), `Olá, ${primeiroNome(v.clienteNome)}! Aqui é ${primeiroNome(S.me.nome)}, da ${lnNx(v.lojaId)}. Vi que a parcela ${p.n} do seu celular venceu em ${fmtD(p.venc)}. Dá para pagar pelo app NexumCell, na aba Parcelas, com Pix. Qualquer dúvida, me chama.`); })}`;
+};
+ACT.cartLink = () => { const l = linkVendas(); (navigator.clipboard ? navigator.clipboard.writeText(l) : Promise.reject()).then(() => toast('Link copiado', 'ok'), () => prompt('Copie o link:', l)); };
+
+/* rascunho da nova venda: guarda o que foi digitado neste aparelho (some depois de 24 h ou quando a venda é salva) */
+{ const RK = 'nx_rasc_' + (PORTAL || ''), _nv = PAGES.nova; PAGES.nova = async (...a) => { await _nv(...a); const v = $('#view'); if (!v || !v.querySelector('input,select,textarea')) return;
+  const campos = () => [...v.querySelectorAll('input[id],select[id],textarea[id]')].filter(x => !['file', 'password', 'hidden', 'checkbox', 'radio'].includes(x.type));
+  let r = null; try { r = JSON.parse(localStorage.getItem(RK) || 'null'); } catch (e) { } if (r && (r.uid !== S.me?.uid || Date.now() - r.em > 864e5)) { localStorage.removeItem(RK); r = null; }
+  if (r && Object.values(r.d || {}).some(x => x)) { v.insertAdjacentHTML('afterbegin', `<div class="card mb" id="rascBox" style="border-left:4px solid #E2B33B"><div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><div><b>Venda não terminada</b><br><span class="small muted">${esc(r.d[Object.keys(r.d).find(k => /nome/i.test(k))] || 'Cliente sem nome')} · guardada às ${new Date(r.em).toLocaleTimeString('pt-BR').slice(0, 5)}${navigator.onLine ? '' : ' · você está sem internet'}</span></div><div class="row" style="gap:6px"><button class="btn sm" id="rascNao">Descartar</button><button class="btn sm gold" id="rascSim">Continuar de onde parou</button></div></div></div>`);
+    $('#rascSim').onclick = () => { campos().forEach(x => { if (r.d[x.id] != null && !x.value) { x.value = r.d[x.id]; x.dispatchEvent(new Event('input', { bubbles: true })); x.dispatchEvent(new Event('change', { bubbles: true })); } }); $('#rascBox').remove(); toast('Dados recuperados. Fotos e documentos precisam ser enviados de novo.', 'ok'); };
+    $('#rascNao').onclick = () => { localStorage.removeItem(RK); $('#rascBox').remove(); }; }
+  let t; v.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => { const d = {}; campos().forEach(x => { if (x.value && x.value.length < 300) d[x.id] = x.value; }); try { if (Object.keys(d).length) localStorage.setItem(RK, JSON.stringify({ uid: S.me.uid, em: Date.now(), d })); } catch (e) { } }, 600); }); }; }
+{ const limpa = c => { if (c === 'vendas') try { localStorage.removeItem('nx_rasc_' + PORTAL); } catch (e) { } };
+  const _ad = DB.add, _se = DB.set; DB.add = async function (c, ...a) { const r = await _ad.call(this, c, ...a); limpa(c); return r; };
+  DB.set = async function (c, id, d, ...a) { const r = await _se.call(this, c, id, d, ...a); if (d && d.status) limpa(c); return r; }; }
+addEventListener('offline', () => toast('Sem internet: o que você digitar na venda fica guardado neste aparelho.', 'err'));
+
 </script>
 </body>
 </html>
