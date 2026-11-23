@@ -10697,6 +10697,15 @@ ACT.cartLink = () => { const l = linkVendas(); (navigator.clipboard ? navigator.
   DB.set = async function (c, id, d, ...a) { const r = await _se.call(this, c, id, d, ...a); if (d && d.status) limpa(c); return r; }; }
 addEventListener('offline', () => toast('Sem internet: o que você digitar na venda fica guardado neste aparelho.', 'err'));
 
+
+/* treinamento obrigatório: sem concluir, vendedor e gerente não usam nem veem o sistema (vale em toda tela, não só no login) */
+{ const trancar=()=>{ try{ if(!S.me||!precisaTrilha()) return; if($('#tvPlayer')) return; if(!$('#trilha')) mostrarTrilha(); }catch(e){} };
+  const _rT=render; render=async(...a)=>{ if(S.me&&precisaTrilha()){ trancar(); if(!['treinamento'].includes(S.tab)) S.tab='treinamento'; } return _rT(...a); };
+  new MutationObserver(()=>{ if(S.me&&precisaTrilha()&&!$('#trilha')&&!$('#tvPlayer')) setTimeout(trancar,150); }).observe(document.body,{childList:true});
+  setInterval(trancar,2000);
+  const _go=ACT.go; if(_go) ACT.go=(d,b)=>{ if(S.me&&precisaTrilha()&&d.tab!=='treinamento'){ trancar(); return; } return _go(d,b); };
+}
+
 </script>
 </body>
 </html>
