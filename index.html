@@ -10740,6 +10740,32 @@ PAGES.metas = async () => {
     <div class="row" style="gap:8px;flex-wrap:wrap"><a class="btn" href="${URL_METAS}" target="_blank" rel="noopener">Abrir o app</a>${ehVend ? '' : `<button class="btn" data-act="linkCopiarM">Copiar link</button><a class="btn" href="https://wa.me/?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">Mandar para a equipe</a>`}</div></div></div>
     ${ehVend ? '' : `<div class="card mt"><h2 style="margin:0 0 6px">Como funciona</h2><ol style="margin:0;padding-left:20px;line-height:1.9"><li>No app, aba <b>Equipe</b>: cadastre cada pessoa com nome, CPF e data de nascimento.</li><li>Aba <b>Metas e bônus</b>: crie as categorias, a meta de cada um e quanto ganha em cada faixa (80%, 100%, 120%…).</li><li>Mande o link. Cada pessoa entra com o CPF e cria a própria senha no primeiro acesso.</li><li>Acompanhe no <b>Painel</b> (tendência, matriz por categoria) e no <b>Bônus</b> (projeção do mês).</li></ol></div>`}`;
 };
+
+/* metas: vendedor lança película/capa/acessório/seguro sem sair do sistema */
+async function metasMinhaPessoa(){ const ps=(await DB.list('metasPessoas',[['vendedorUid','==',S.me.uid]]).catch(()=>[])).filter(p=>p.ativo!==false); return ps.sort((a,b)=>(b.atualizadoEm||0)-(a.atualizadoEm||0))[0]||null; }
+ACT.lancMeta = async () => {
+  const hoje=new Date(Date.now()-3*36e5).toISOString().slice(0,10), mes=hoje.slice(0,7);
+  const p=await metasMinhaPessoa();
+  if(!p){ openModal(`<h2 style="margin:0 0 8px">Lançar venda nas metas</h2><p class="muted">Você ainda não está ligado às metas. Peça ao seu gerente para cadastrar você no app Metas & Bônus (aba Equipe) e escolher o seu login em "Vendas do sistema".</p><div class="row mt" style="justify-content:flex-end"><button class="btn" data-act="closeModal">Fechar</button></div>`); return; }
+  const pl=await DB.get('metasPlano',p.escopo+'_'+mes).catch(()=>null);
+  const cats=(pl?.categorias||[]).filter(c=>c.fonte==='manual');
+  if(!cats.length){ openModal(`<h2 style="margin:0 0 8px">Lançar venda nas metas</h2><p class="muted">O seu gerente ainda não definiu as metas deste mês, ou todas as categorias contam sozinhas pelo sistema.</p><div class="row mt" style="justify-content:flex-end"><button class="btn" data-act="closeModal">Fechar</button></div>`); return; }
+  const st='display:block;font-size:12.5px;font-weight:600;color:#667085', ip='display:block;width:100%;margin-top:5px';
+  openModal(`<h2 style="margin:0 0 4px">Lançar venda nas metas</h2><p class="muted" style="margin:0 0 12px">Entra na hora no seu painel e no seu bônus de ${new Date(mes+'-02').toLocaleDateString('pt-BR',{month:'long'})}.</p>
+    <div class="grid g2"><label style="${st}">Categoria<select id="lmCat" style="${ip}">${cats.map(c=>`<option value="${esc(c.id)}" data-t="${c.tipo}">${esc(c.nome)}</option>`).join('')}</select></label>
+    <label style="${st}">Data<input id="lmData" type="date" value="${hoje}" min="${mes}-01" max="${hoje}" style="${ip}"></label>
+    <label style="${st}">Quantidade<input id="lmQtd" type="number" min="1" step="1" value="1" style="${ip}"></label>
+    <label style="${st}">Valor total (R$)<input id="lmVal" type="number" min="0" step="0.01" placeholder="0,00" style="${ip}"></label></div>
+    <label style="${st};margin-top:10px">Observação (opcional)<input id="lmObs" maxlength="120" placeholder="Cliente ou nº da venda" style="${ip}"></label>
+    <div class="row mt" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><a class="btn" href="${URL_METAS}" target="_blank" rel="noopener">Ver minhas metas</a><div class="row" style="gap:8px"><button class="btn" data-act="closeModal">Cancelar</button><button class="btn gold" id="lmOk">Lançar</button></div></div>`);
+  $('#lmOk').onclick=async e=>{ const sel=$('#lmCat'), tipo=sel.selectedOptions[0].dataset.t, q=+$('#lmQtd').value||0, v=+$('#lmVal').value||0, d=$('#lmData').value;
+    if(!d||!d.startsWith(mes)) return toast('Escolha uma data deste mês','err'); if(tipo==='rs'&&!(v>0)) return toast('Informe o valor','err'); if(!(q>0)) return toast('Informe a quantidade','err');
+    e.currentTarget.disabled=true;
+    try{ await DB.add('metasLanc',{escopo:p.escopo,mes,cpf:p.cpf,cat:sel.value,qtd:q,valor:v,data:d,obs:$('#lmObs').value.trim(),por:S.me.nome||p.nome,porUid:S.me.uid,em:Date.now()}); closeModal(); toast('Venda lançada nas suas metas'); }
+    catch(er){ toast('Não foi possível lançar: '+(er.message||er),'err'); e.currentTarget.disabled=false; } };
+};
+{ const _m=PAGES.metas; PAGES.metas=async(...a)=>{ await _m(...a); if(PORTAL==='vendedor'&&!can('DONO','GERENTE')){ $('#topActions').innerHTML='<button class="btn gold" data-act="lancMeta">Lançar venda nas metas</button>';
+  $('#view').insertAdjacentHTML('beforeend',`<div class="card mt"><div class="row" style="justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center"><div><h2 style="margin:0 0 4px">Vendeu película, capa, acessório ou seguro?</h2><p class="muted" style="margin:0">Lance aqui mesmo, sem sair do sistema. Os aparelhos entram sozinhos.</p></div><button class="btn gold" data-act="lancMeta">Lançar venda</button></div></div>`); } }; }
 </script>
 </body>
 </html>
