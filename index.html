@@ -2206,7 +2206,7 @@ async function avisoTravas(){
     const ch=chips.length?`<div class="aviso-trava bad" data-act="verChips">${svg('<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 6h4"/>')}<b>Troca de chip em ${chips.length} aparelho(s)</b><span>Pode ser revenda ou golpe. Clique para conferir.</span></div>`:'';
     const rb=roubos.length?`<div class="aviso-trava bad" data-act="verRoubos">${svg(IC.listanegra)}<b>${roubos.length} cliente(s) comunicaram roubo, furto ou perda</b><span>O aparelho já foi travado. Clique para ver e tratar.</span></div>`:'';
     const dias=S.cfg.ultimoBackup?Math.floor((Date.now()-S.cfg.ultimoBackup)/86400000):999;
-    const bk=can('DONO')&&dias>=7?`<div class="aviso-trava" data-act="go" data-tab="config">${svg(IC.config)}<b>Faça a cópia de segurança da semana</b><span>${S.cfg.ultimoBackup?'Última há '+dias+' dias.':'Nenhuma cópia feita ainda.'} Clique para ir às configurações.</span></div>`:'';
+    const bk=can('DONO')&&PORTAL==='dono'&&dias>=7?`<div class="aviso-trava" data-act="go" data-tab="config">${svg(IC.config)}<b>Faça a cópia de segurança da semana</b><span>${S.cfg.ultimoBackup?'Última há '+dias+' dias.':'Nenhuma cópia feita ainda.'} Clique para ir às configurações.</span></div>`:'';
     let vs=(await loadVendas()).filter(v=>v.status==='INSTALANDO');
     const ss=can('DONO','FINANCEIRO','SUPORTE')?aps.filter(a=>a.status==='ATIVO'&&!a.quitado&&a.checkin?.em&&Date.now()-a.checkin.em>86400000*diasSemSinal()):[];
     const fx=can('DONO','FINANCEIRO','SUPORTE')?aps.filter(a=>a.status==='ATIVO'&&!a.quitado&&foraDoPais(a)):[]; marcarForaDoPais(aps);
@@ -10705,6 +10705,29 @@ addEventListener('offline', () => toast('Sem internet: o que você digitar na ve
   setInterval(trancar,2000);
   const _go=ACT.go; if(_go) ACT.go=(d,b)=>{ if(S.me&&precisaTrilha()&&d.tab!=='treinamento'){ trancar(); return; } return _go(d,b); };
 }
+
+/* ===================== METAS NO MENU (metas e bônus + app Minhas Metas) ===================== */
+const URL_METAS = (window.NEXUMCELL_URLS?.metas) || 'https://nexumrh.github.io/metas/';
+if (['dono', 'gerente', 'vendedor'].includes(PORTAL)) {
+  IC.metas = '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>';
+  const ehVend = PORTAL === 'vendedor';
+  TABS.push({ id: 'metas', label: ehVend ? 'Minhas metas' : 'Metas e bônus', roles: ehVend ? ['VENDEDOR', 'GERENTE', 'DONO'] : ['DONO', 'GERENTE'] });
+  if (!P.tabs.includes('metas')) P.tabs.splice(Math.max(0, P.tabs.indexOf(ehVend ? 'comissoes' : 'equipe')), 0, 'metas');
+  const g = NAV_GRUPOS.find(x => x[0] === (ehVend ? 'Financeiro' : 'Lojas e equipe')) || NAV_GRUPOS.find(x => x[0] === 'Vendas');
+  if (g && !g[1].includes('metas')) { const i = g[1].indexOf(ehVend ? 'comissoes' : 'equipe'); g[1].splice(i < 0 ? g[1].length : i, 0, 'metas'); }
+}
+PAGES.metas = async () => {
+  const ehVend = PORTAL === 'vendedor' && !can('DONO', 'GERENTE'), wa = 'https://wa.me/?text=' + encodeURIComponent('Acompanhe as suas metas e o seu bônus do mês pelo app Minhas Metas da NexumCell (entre com o seu ID e senha do sistema): ' + URL_METAS);
+  $('#topActions').innerHTML = ehVend ? '' : '<button class="btn gold" data-act="configMetas">Definir metas e bônus</button>';
+  $('#view').innerHTML = `<div class="card" style="background:linear-gradient(135deg,#0A1733,#16306B);color:#fff;border:0"><div class="row" style="justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center">
+      <div style="max-width:620px"><small style="opacity:.75;text-transform:uppercase;letter-spacing:.08em">App Minhas Metas</small><h2 style="margin:4px 0 6px;color:#fff">${ehVend ? 'Suas metas e o seu bônus do mês' : 'Metas e bônus da equipe'}</h2>
+      <p style="margin:0;opacity:.85;font-size:14px">${ehVend ? 'Abra no celular para ver quanto falta para bater cada meta e quanto você já ganhou de bônus. Entre com o mesmo ID e senha do sistema.' : PORTAL === 'dono' ? 'Defina as metas e o bônus da equipe Nexum. Cada pessoa acompanha no app Minhas Metas, no celular, com o próprio login.' : 'Defina quanto cada vendedor da sua loja precisa vender no mês e quanto ganha de bônus. Cada vendedor acompanha no app Minhas Metas, no celular.'}</p></div>
+      <div class="row" style="gap:8px;flex-wrap:wrap"><a class="btn" href="${URL_METAS}" target="_blank" rel="noopener">Abrir o app</a>${ehVend ? '' : `<button class="btn" data-act="linkCopiarM">Copiar link</button><a class="btn gold" href="${wa}" target="_blank" rel="noopener">Mandar para a equipe</a>`}</div></div></div>
+    ${ehVend ? '<div id="mtMinha" class="mt"></div>' : `<div class="card mt"><h2 style="margin:0 0 6px">Como funciona</h2><ol style="margin:0;padding-left:20px;line-height:1.8"><li>Clique em <b>Definir metas e bônus</b> e escolha o mês${PORTAL === 'gerente' ? '' : ' e a loja'}.</li><li>Coloque a meta de cada vendedor (aparelhos, faturamento, películas, capinhas, acessórios e seguros) e o bônus de cada faixa.</li><li>Mande o link do app para a equipe. Cada um vê só as próprias metas, com o login do sistema.</li></ol></div>`}`;
+  if (ehVend && typeof PAGES.inicio === 'function') { /* mostra o cartão Minhas Metas que já existe no Início */
+    const v = document.createElement('div'); const vw = $('#view'); const tmp = vw.innerHTML; try { await PAGES.inicio(); const c = [...$('#view').querySelectorAll('.card')].find(x => /Minhas Metas/.test(x.querySelector('h2')?.textContent || '')); const h = c ? c.outerHTML : ''; vw.innerHTML = tmp; $('#mtMinha').innerHTML = h || ''; } catch (e) { vw.innerHTML = tmp; } }
+};
+ACT.linkCopiarM = () => { (navigator.clipboard ? navigator.clipboard.writeText(URL_METAS) : Promise.reject()).then(() => toast('Link copiado', 'ok'), () => prompt('Copie o link:', URL_METAS)); };
 
 </script>
 </body>
