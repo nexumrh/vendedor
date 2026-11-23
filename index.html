@@ -10732,7 +10732,7 @@ ACT.linkCopiarM = () => { (navigator.clipboard ? navigator.clipboard.writeText(U
 
 /* metas v2: app Metas & Bônus (entrada por CPF) */
 PAGES.metas = async () => {
-  const ehVend = PORTAL === 'vendedor' && !can('DONO', 'GERENTE'), msg = 'As suas metas e o seu bônus do mês estão no app Metas & Bônus da NexumCell: ' + URL_METAS + '\nEntre com o seu CPF. No primeiro acesso, confirme a data de nascimento e crie a sua senha.';
+  const ehVend = PORTAL === 'vendedor', msg = 'As suas metas e o seu bônus do mês estão no app Metas & Bônus da NexumCell: ' + URL_METAS + '\nEntre com o seu CPF. No primeiro acesso, confirme a data de nascimento e crie a sua senha.';
   $('#topActions').innerHTML = ehVend ? '' : `<a class="btn gold" href="${URL_METAS}" target="_blank" rel="noopener">Abrir e definir metas</a>`;
   $('#view').innerHTML = `<div class="card" style="background:linear-gradient(135deg,#0A1733,#16306B);color:#fff;border:0"><div class="row" style="justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center">
     <div style="max-width:640px"><small style="opacity:.75;text-transform:uppercase;letter-spacing:.08em">App Metas & Bônus</small><h2 style="margin:4px 0 6px;color:#fff">${ehVend ? 'Suas metas e o seu bônus do mês' : 'Metas e bônus da equipe'}</h2>
@@ -10764,13 +10764,13 @@ ACT.lancMeta = async () => {
     try{ await DB.add('metasLanc',{escopo:p.escopo,mes,cpf:p.cpf,cat:sel.value,qtd:q,valor:v,data:d,obs:$('#lmObs').value.trim(),por:S.me.nome||p.nome,porUid:S.me.uid,em:Date.now()}); closeModal(); toast('Venda lançada nas suas metas'); }
     catch(er){ toast('Não foi possível lançar: '+(er.message||er),'err'); e.currentTarget.disabled=false; } };
 };
-{ const _m=PAGES.metas; PAGES.metas=async(...a)=>{ await _m(...a); if(PORTAL==='vendedor'&&!can('DONO','GERENTE')){ $('#topActions').innerHTML='<button class="btn gold" data-act="lancMeta">Lançar venda nas metas</button>';
+{ const _m=PAGES.metas; PAGES.metas=async(...a)=>{ await _m(...a); if(PORTAL==='vendedor'){ $('#topActions').innerHTML='<button class="btn gold" data-act="lancMeta">Lançar venda nas metas</button>';
   $('#view').insertAdjacentHTML('beforeend',`<div class="card mt"><div class="row" style="justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center"><div><h2 style="margin:0 0 4px">Vendeu película, capa, acessório ou seguro?</h2><p class="muted" style="margin:0">Lance aqui mesmo, sem sair do sistema. Os aparelhos entram sozinhos.</p></div><button class="btn gold" data-act="lancMeta">Lançar venda</button></div></div>`); } }; }
 
 /* atalho no menu: abre direto o app Metas & Bônus */
 ACT.abrirMetasApp = () => { window.open('https://nexumrh.github.io/metas/', '_blank', 'noopener'); };
 { const _rn = renderNav; renderNav = async (...a) => { await _rn(...a); const nav = document.getElementById('nav'); if (!nav || nav.querySelector('[data-act=abrirMetasApp]')) return;
-  const gestor = typeof can === 'function' && can('DONO', 'GERENTE');
+  const gestor = PORTAL !== 'vendedor' && typeof can === 'function' && can('DONO', 'GERENTE');
   const b = document.createElement('button'); b.dataset.act = 'abrirMetasApp'; b.title = 'Abre o app Metas & Bônus em outra aba';
   b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>' + (gestor ? 'Abrir app de metas' : 'Abrir Minhas Metas') + '</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;margin-left:auto;opacity:.6"><path d="M7 17 17 7M8 7h9v9"/></svg>';
   const ini = nav.querySelector('[data-tab=inicio]'); if (ini) ini.after(b); else nav.prepend(b); }; }
